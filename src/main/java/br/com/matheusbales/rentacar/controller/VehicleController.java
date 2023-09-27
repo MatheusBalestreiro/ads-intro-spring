@@ -1,8 +1,9 @@
 package br.com.matheusbales.rentacar.controller;
 
-
 import br.com.matheusbales.rentacar.dto.CustomerDTO;
+import br.com.matheusbales.rentacar.dto.VehicleDTO;
 import br.com.matheusbales.rentacar.service.CustomerService;
+import br.com.matheusbales.rentacar.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,40 +12,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customers")
-public class CustomerController {
+@RequestMapping("/api/vehicle")
+public class VehicleController {
     @Autowired
-    private CustomerService service;
+    private VehicleService service;
 
     @PostMapping
-    public CustomerDTO create(@RequestBody CustomerDTO dto){
+    public VehicleDTO create(@RequestBody VehicleDTO dto){
         return service.create(dto);
     }
 
     @GetMapping("/{id}")
-    public CustomerDTO findById(@PathVariable("id") int id){
+    public VehicleDTO findById(@PathVariable("id") int id){
         return service.findById(id);
     }
 
     @GetMapping
-    public List<CustomerDTO> findAll(){
+    public List<VehicleDTO> findAll(){
         return service.findAll();
     }
 
     @PutMapping
-    public CustomerDTO update(@RequestBody CustomerDTO dto){
+    public VehicleDTO update(@RequestBody VehicleDTO dto){
         return service.update(dto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id){
-        CustomerDTO dto = service.findById(id);
+        VehicleDTO dto = service.findById(id);
         service.delete(dto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-
-
-
 
 }
