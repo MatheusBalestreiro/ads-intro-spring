@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,9 @@ public class CustomerController {
             @ApiResponse(description = "Internal Error!", responseCode = "500", content = {@Content})
     })
     public CustomerDTO findById(@PathVariable("id") int id){
-        return service.findById(id);
+        CustomerDTO dto = service.findById(id);
+        buildEntityLink(dto);
+        return dto;
     }
 
     @GetMapping
@@ -59,8 +62,14 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
-
-
+    public void buildEntityLink(CustomerDTO dto){
+        dto.add(
+          WebMvcLinkBuilder.linkTo(
+                  WebMvcLinkBuilder.methodOn(
+                          this.getClass()
+                  ).findById(dto.getId())
+          ).withSelfRel()
+        );
+    }
 
 }
