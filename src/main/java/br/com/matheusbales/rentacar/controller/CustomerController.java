@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +48,14 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<CustomerDTO> findAll(){
-        return service.findAll();
+    public CollectionModel<CustomerDTO> findAll(){
+        CollectionModel<CustomerDTO> customers = CollectionModel.of(service.findAll());
+        for(final CustomerDTO dto : customers){
+            buildEntityLink(dto);
+        }
+        buildCollectionLink(customers);
+
+        return customers;
     }
 
     @PutMapping
@@ -62,14 +70,21 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    public void buildEntityLink(CustomerDTO dto){
-        dto.add(
+    public void buildEntityLink(CustomerDTO customer){
+        customer.add(
           WebMvcLinkBuilder.linkTo(
                   WebMvcLinkBuilder.methodOn(
                           this.getClass()
-                  ).findById(dto.getId())
+                  ).findById(customer.getId())
           ).withSelfRel()
         );
     }
 
+    public void buildCollectionLink(CollectionModel<CustomerDTO> customers){
+        customers.add(
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(this.getClass()).findAll()
+                ).withRel(IanaLinkRelations.COLLECTION)
+        );
+    }
 }
